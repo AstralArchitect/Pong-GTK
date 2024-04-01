@@ -9,6 +9,8 @@
 #define PLAYERS_WIDTH 20
 #define PLYERS_HEIGHT 80
 
+time_t start, stop;
+
 GtkWidget *drawing_area;
 struct Ball
 {
@@ -70,6 +72,8 @@ gboolean update_ball_and_ennemi_position(int argc, char *argv[]) {
         //sinon
         else{
             //vous avez perdu, arret du jeu
+            stop = time(NULL);
+            g_print("Vous avez perdu !, score : %d\n", stop - start);
             sleep(2);
             exit(0);
         }
@@ -130,6 +134,7 @@ gboolean delet_all(GtkWidget *widget, cairo_t *cr, gpointer data) {
 }
 
 void play(GtkButton *button, gpointer user_data) {
+    start = time(NULL);
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_window_set_resizable (window, false);
