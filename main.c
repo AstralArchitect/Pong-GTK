@@ -55,6 +55,17 @@ gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 }
 
 void quitter(){
+    int meilleur_score;
+    FILE *save = fopen("score.txt", "r");
+    if(save != NULL){
+        fscanf(save, "score : %d", &meilleur_score);
+        if(meilleur_score < stop - start){
+            fclose(save);
+            FILE *save = fopen("score.txt", "w+");
+            fprintf(save, "score : %d", stop - start);
+            fclose(save);
+        }
+    }
     exit(0);
 }
 
@@ -164,6 +175,19 @@ gboolean delet_all(GtkWidget *widget, cairo_t *cr, gpointer data) {
 }
 
 void play(GtkButton *button, gpointer user_data) {
+    char score_text[50] = "Pong";
+    int score;
+    FILE *save = fopen("score.txt", "r");
+    if(save != NULL){
+        fscanf(save, "score : %d", &score);
+        sprintf(score_text, "Pong, meilleur score : %d", score);
+        fclose(save);
+    }
+    else{
+        FILE *save = fopen("score.txt", "w+");
+        fputc("0", save);
+        fclose(save);
+    }
     start = time(NULL);
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
@@ -171,7 +195,7 @@ void play(GtkButton *button, gpointer user_data) {
 
     drawing_area = gtk_drawing_area_new();
     gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH, WINDOW_HEIGHT);
-    gtk_window_set_title(GTK_WINDOW(window), "Pong");
+    gtk_window_set_title(GTK_WINDOW(window), score_text);
     gtk_container_add(GTK_CONTAINER(window), drawing_area);
 
     g_signal_connect(drawing_area, "draw", G_CALLBACK(draw_callback), NULL);
