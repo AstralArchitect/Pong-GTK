@@ -2,6 +2,7 @@
 #include <glib.h>
 #include <time.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -33,10 +34,17 @@ struct Ball ball = {0, 0, 5.0, 3.0};
 
 gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     if (event->keyval == GDK_KEY_Up) {
-        player.y-=5;
+        if (player.y > 0)
+        {
+            player.y -= 10;
+        }
     }
     else if (event->keyval == GDK_KEY_Down) {
-        player.y+=10;
+        if (player.y + player.size_y > WINDOW_HEIGHT)
+        {
+            player.y -= 10;
+        }
+        player.y += 10;
     }
     else if (event->keyval == 'q' || event->keyval == 'Q')
     {
@@ -46,17 +54,41 @@ gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_d
     return TRUE;
 }
 
+void quitter(){
+    exit(0);
+}
+
+void Perdu() {
+    gtk_init(NULL, NULL);
+
+    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_widget_set_size_request(window, 400, 100);
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    gtk_window_set_resizable(window, false);
+
+    char score_text[50];
+    sprintf(score_text, "Perdu ! Score : %d", stop - start);
+    gtk_window_set_title(GTK_WINDOW(window), score_text);
+
+    GtkWidget *button_quit = gtk_button_new_with_label("Cliquez pour quitter.");
+
+    g_signal_connect(button_quit, "clicked", G_CALLBACK(quitter), NULL);
+
+    gtk_container_add(GTK_CONTAINER(window), button_quit);
+
+    gtk_widget_show_all(window);
+
+    gtk_main();
+
+    return 0;
+}
+
 gboolean update_ball_and_ennemi_position(int argc, char *argv[]) {
     //bouger la balle
     ball.x += ball.moveSpeedX;
     ball.y += ball.moveSpeedY;
-    if(ball.y < WINDOW_HEIGHT / 2){
-        ennemi.y = ball.y;
-    }
-    else{
-        ennemi.y = ball.y - (ennemi.size_y - BALL_SIZE);
-    }
-    //si la balle est à droite alors
+    ennemi.y = ball.y - ennemi.size_y / 2;
+    //si la balle est à gauch alors
     if (ball.x <= 0 + player.size_x)
         //si elle touche le joueur alors
         if(ball.y < player.y + player.size_y && ball.y + 20 > player.y){
@@ -73,12 +105,10 @@ gboolean update_ball_and_ennemi_position(int argc, char *argv[]) {
         else{
             //vous avez perdu, arret du jeu
             stop = time(NULL);
-            g_print("Vous avez perdu !, score : %d\n", stop - start);
-            sleep(2);
-            exit(0);
+            Perdu();
         }
-    //sinon, si elle est à gauche alors
-    else if (ball.x + BALL_SIZE >= WINDOW_WIDTH)
+    //sinon, si elle est à droite alors
+    else if (ball.x + BALL_SIZE >= WINDOW_WIDTH - ennemi.size_x)
     {
         //rebondir et augmenter la vitesse
         ball.moveSpeedX = -ball.moveSpeedX;
@@ -157,17 +187,16 @@ void play(GtkButton *button, gpointer user_data) {
 }
 
 void quit(GtkWidget *widget, gpointer data) {
-    g_print("Quitter l'application\n");
     gtk_main_quit();
 }
 
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
-    g_print("Bienvenu sur pong !\n");
 
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_window_set_resizable(window, false);
+    gtk_window_set_title(GTK_WINDOW(window), "Pong: Menu");
 
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
 
