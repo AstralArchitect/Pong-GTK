@@ -129,10 +129,7 @@ gboolean delet_all(GtkWidget *widget, cairo_t *cr, gpointer data) {
     return false;
 }
 
-int main(int argc, char *argv[]) {
-
-    gtk_init(&argc, &argv);
-
+void play(GtkButton *button, gpointer user_data) {
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_window_set_resizable (window, false);
@@ -150,6 +147,35 @@ int main(int argc, char *argv[]) {
 
     g_timeout_add(30, (GSourceFunc)update_ball_and_ennemi_position, NULL);
 
+
+    gtk_widget_show_all(window);
+}
+
+void quit(GtkWidget *widget, gpointer data) {
+    g_print("Quitter l'application\n");
+    gtk_main_quit();
+}
+
+int main(int argc, char *argv[]) {
+    gtk_init(&argc, &argv);
+    g_print("Bienvenu sur pong !\n");
+
+    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    gtk_window_set_resizable(window, false);
+
+    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+
+    GtkWidget *button_play = gtk_button_new_with_label("Jouer à Pong");
+    GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
+
+    g_signal_connect(button_play, "clicked", G_CALLBACK(play), NULL);
+    g_signal_connect(button_quit, "clicked", G_CALLBACK(quit), NULL);
+
+    gtk_container_add(GTK_CONTAINER(box), button_play);
+    gtk_container_add(GTK_CONTAINER(box), button_quit);
+
+    gtk_container_add(GTK_CONTAINER(window), box);
 
     gtk_widget_show_all(window);
 
