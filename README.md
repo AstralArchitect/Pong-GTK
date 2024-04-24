@@ -1,2 +1,2 @@
 # Description
-Ceci est un pong en C utilisant la librairie GTK3
+Ceci est un pong en C créé avec GTK4
