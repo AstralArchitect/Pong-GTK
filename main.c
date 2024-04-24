@@ -27,10 +27,12 @@ struct Player
     int size_x;
     int size_y;
 };
-struct Player player = {0, 0, PLAYERS_WIDTH, PLYERS_HEIGHT};
+struct Player player = {0, WINDOW_HEIGHT / 2, PLAYERS_WIDTH, PLYERS_HEIGHT};
 struct Player ennemi = {WINDOW_WIDTH - PLAYERS_WIDTH, 0, PLAYERS_WIDTH, PLYERS_HEIGHT};
 
 struct Ball ball = {0, 0, 5.0, 3.0};
+
+GtkWidget *window;
 
 gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     if (event->keyval == GDK_KEY_Up) {
@@ -72,7 +74,8 @@ void quitter(){
 void Perdu() {
     gtk_init(NULL, NULL);
 
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_widget_hide(window);
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_widget_set_size_request(window, 400, 100);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_window_set_resizable(window, false);
@@ -189,7 +192,8 @@ void play(GtkButton *button, gpointer user_data) {
         fclose(save);
     }
     start = time(NULL);
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_widget_hide(window);
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_window_set_resizable (window, false);
 
@@ -217,7 +221,7 @@ void quit(GtkWidget *widget, gpointer data) {
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_window_set_resizable(window, false);
     gtk_window_set_title(GTK_WINDOW(window), "Pong: Menu");
