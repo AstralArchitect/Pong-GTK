@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_window_set_resizable((GtkWindow*)window, false);
-    gtk_window_set_title(GTK_WINDOW(window), "Pong: Menu");
+    gtk_window_set_title(GTK_WINDOW(window), "Pong Launcher");
 
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
 
