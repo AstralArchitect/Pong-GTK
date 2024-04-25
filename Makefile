@@ -1,13 +1,14 @@
 .SILENT:
 all:
-	windres info.rc -O coff -o info.res
-	gcc `pkg-config gtk+-3.0 --cflags` main.c `pkg-config gtk+-3.0 --libs` info.res -o main.exe
+	meson setup build/
+	meson compile -C build/
+install:
+	meson setup build/
+	meson install -C build/
 run:
-	windres info.rc -O coff -o info.res
-	gcc `pkg-config gtk+-3.0 --cflags` main.c `pkg-config gtk+-3.0 --libs` info.res -o main.exe
-	./main.exe
-	rm info.res main.exe
+	meson setup run/
+	meson compile -C run/
+	run/Pong_launcher
+	rm -r run/
 clean:
-	rm info.res
-remove:
-	rm main.exe score.txt info.res
+	rm build/ -rf

@@ -2,15 +2,12 @@
 #include <glib.h>
 #include <time.h>
 #include <stdbool.h>
-#include <stdio.h>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
 #define BALL_SIZE 20
 #define PLAYERS_WIDTH 20
 #define PLYERS_HEIGHT 80
-
-time_t start, stop;
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
 
 GtkWidget *drawing_area;
 struct Ball
@@ -32,7 +29,7 @@ struct Player ennemi = {WINDOW_WIDTH - PLAYERS_WIDTH, 0, PLAYERS_WIDTH, PLYERS_H
 
 struct Ball ball = {0, 0, 5.0, 3.0};
 
-GtkWidget *window;
+time_t start, stop;
 
 gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     if (event->keyval == GDK_KEY_Up) {
@@ -64,24 +61,32 @@ void quitter(){
         if(meilleur_score < stop - start){
             fclose(save);
             FILE *save = fopen("score.txt", "w+");
-            fprintf(save, "score : %d", stop - start);
+            #ifdef _WIN32
+            fprintf(save, "%lld", stop - start);
+            #else
+            fprintf(save, "%ld", stop - start);
+            #endif
             fclose(save);
         }
     }
     exit(0);
 }
 
-void Perdu() {
+void Perdu(GtkWidget *window) {
     gtk_init(NULL, NULL);
 
     gtk_widget_hide(window);
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_widget_set_size_request(window, 400, 100);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_window_set_resizable(window, false);
+    gtk_window_set_resizable((GtkWindow*)window, false);
 
     char score_text[50];
-    sprintf(score_text, "Perdu ! Score : %d", stop - start);
+    #ifdef _WIN32
+    sprintf(score_text, "Perdu ! Score : %lld", stop - start);
+    #else
+    sprintf(score_text, "Perdu ! Score : %ld", stop - start);
+    #endif
     gtk_window_set_title(GTK_WINDOW(window), score_text);
 
     GtkWidget *button_quit = gtk_button_new_with_label("Cliquez pour quitter.");
@@ -93,11 +98,9 @@ void Perdu() {
     gtk_widget_show_all(window);
 
     gtk_main();
-
-    return 0;
 }
 
-gboolean update_ball_and_ennemi_position(int argc, char *argv[]) {
+gboolean update_ball_and_ennemi_position(GtkWidget* window) {
     //bouger la balle
     ball.x += ball.moveSpeedX;
     ball.y += ball.moveSpeedY;
@@ -119,7 +122,7 @@ gboolean update_ball_and_ennemi_position(int argc, char *argv[]) {
         else{
             //vous avez perdu, arret du jeu
             stop = time(NULL);
-            Perdu();
+            Perdu(window);
         }
     //sinon, si elle est à droite alors
     else if (ball.x + BALL_SIZE >= WINDOW_WIDTH - ennemi.size_x)
@@ -177,25 +180,26 @@ gboolean delet_all(GtkWidget *widget, cairo_t *cr, gpointer data) {
     return false;
 }
 
-void play(GtkButton *button, gpointer user_data) {
-    char score_text[50] = "Pong";
+void play(GtkButton *button, gpointer *pointer) {
+    GtkWidget* window = (GtkWidget*)pointer;
+    char score_text[50] = "Pong, première partie";
     int score;
     FILE *save = fopen("score.txt", "r");
     if(save != NULL){
-        fscanf(save, "score : %d", &score);
+        fscanf(save, "%d", &score);
         sprintf(score_text, "Pong, meilleur score : %d", score);
         fclose(save);
     }
     else{
         FILE *save = fopen("score.txt", "w+");
-        fputc("0", save);
+        fputc('0', save);
         fclose(save);
     }
     start = time(NULL);
     gtk_widget_hide(window);
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_window_set_resizable (window, false);
+    gtk_window_set_resizable((GtkWindow*)window, false);
 
     drawing_area = gtk_drawing_area_new();
     gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -208,40 +212,8 @@ void play(GtkButton *button, gpointer user_data) {
     ball.x = WINDOW_WIDTH / 2 - BALL_SIZE / 2;
     ball.y = WINDOW_HEIGHT / 2 - BALL_SIZE / 2;
 
-    g_timeout_add(30, (GSourceFunc)update_ball_and_ennemi_position, NULL);
+    g_timeout_add(30, (GSourceFunc)update_ball_and_ennemi_position, window);
 
 
     gtk_widget_show_all(window);
-}
-
-void quit(GtkWidget *widget, gpointer data) {
-    gtk_main_quit();
-}
-
-int main(int argc, char *argv[]) {
-    gtk_init(&argc, &argv);
-
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_window_set_resizable(window, false);
-    gtk_window_set_title(GTK_WINDOW(window), "Pong: Menu");
-
-    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-
-    GtkWidget *button_play = gtk_button_new_with_label("Jouer à Pong");
-    GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
-
-    g_signal_connect(button_play, "clicked", G_CALLBACK(play), NULL);
-    g_signal_connect(button_quit, "clicked", G_CALLBACK(quit), NULL);
-
-    gtk_container_add(GTK_CONTAINER(box), button_play);
-    gtk_container_add(GTK_CONTAINER(box), button_quit);
-
-    gtk_container_add(GTK_CONTAINER(window), box);
-
-    gtk_widget_show_all(window);
-
-    gtk_main();
-
-    return 0;
 }
