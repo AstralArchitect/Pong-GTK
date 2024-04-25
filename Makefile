@@ -6,9 +6,7 @@ install:
 	meson setup build/
 	meson install -C build/
 run:
-	meson setup run/
-	meson compile -C run/
-	run/Pong_launcher
-	rm -r run/
+	make
+	build/Pong_launcher
 clean:
 	rm build/ -rf

@@ -16,6 +16,14 @@ void quit(GtkWidget *widget, gpointer data) {
     gtk_main_quit();
 }
 
+void open_repo(){
+    #ifdef _WIN32 
+    system("start https://github.com/astralarchitect/pong-GTK");
+    #else
+    g_print("Fonction non supporté sur Linux");
+    #endif
+}
+
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
@@ -28,14 +36,17 @@ int main(int argc, char *argv[]) {
 
     GtkWidget *button_play = gtk_button_new_with_label("Jouer à Pong");
     GtkWidget *button_info = gtk_button_new_with_label("info");
+    GtkWidget *button_repo = gtk_button_new_with_label("Repo Github");
     GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
 
     g_signal_connect(button_play, "clicked", G_CALLBACK(play), window);
     g_signal_connect(button_info, "clicked", G_CALLBACK(info), NULL);
+    g_signal_connect(button_repo, "clicked", G_CALLBACK(open_repo), NULL);
     g_signal_connect(button_quit, "clicked", G_CALLBACK(quit), NULL);
 
     gtk_container_add(GTK_CONTAINER(box), button_play);
     gtk_container_add(GTK_CONTAINER(box), button_info);
+    gtk_container_add(GTK_CONTAINER(box), button_repo);
     gtk_container_add(GTK_CONTAINER(box), button_quit);
 
     gtk_container_add(GTK_CONTAINER(window), box);
