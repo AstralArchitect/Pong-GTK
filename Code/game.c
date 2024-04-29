@@ -31,6 +31,12 @@ struct Ball ball = {0, 0, 5.0, 3.0};
 
 time_t start, stop;
 
+unsigned __int16 score = 0;
+int meilleur_score;
+char score_text[50] = "Pong, première partie";
+
+GtkWidget* window;
+
 gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     if (event->keyval == GDK_KEY_Up) {
         if (player.y > 0)
@@ -54,25 +60,16 @@ gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 }
 
 void quitter(){
-    int meilleur_score;
-    FILE *save = fopen("score.txt", "r");
-    if(save != NULL){
-        fscanf(save, "score : %d", &meilleur_score);
-        if(meilleur_score < stop - start){
-            fclose(save);
-            FILE *save = fopen("score.txt", "w+");
-            #ifdef _WIN32
-            fprintf(save, "%lld", stop - start);
-            #else
-            fprintf(save, "%ld", stop - start);
-            #endif
-            fclose(save);
-        }
+    if(meilleur_score < score){
+        FILE *save = fopen("score.bin", "w+b");
+        fwrite(&score, sizeof(unsigned __int16), 1, save);
+        fclose(save);
     }
+    
     exit(0);
 }
 
-void Perdu(GtkWidget *window) {
+void Perdu() {
     gtk_init(NULL, NULL);
 
     gtk_widget_hide(window);
@@ -82,11 +79,7 @@ void Perdu(GtkWidget *window) {
     gtk_window_set_resizable((GtkWindow*)window, false);
 
     char score_text[50];
-    #ifdef _WIN32
-    sprintf(score_text, "Perdu ! Score : %lld", stop - start);
-    #else
-    sprintf(score_text, "Perdu ! Score : %ld", stop - start);
-    #endif
+    sprintf(score_text, "Perdu ! Score : %d", score);
     gtk_window_set_title(GTK_WINDOW(window), score_text);
 
     GtkWidget *button_quit = gtk_button_new_with_label("Cliquez pour quitter.");
@@ -100,7 +93,7 @@ void Perdu(GtkWidget *window) {
     gtk_main();
 }
 
-gboolean update_ball_and_ennemi_position(GtkWidget* window) {
+gboolean update_ball_and_ennemi_position() {
     //bouger la balle
     ball.x += ball.moveSpeedX;
     ball.y += ball.moveSpeedY;
@@ -109,14 +102,17 @@ gboolean update_ball_and_ennemi_position(GtkWidget* window) {
     if (ball.x <= 0 + player.size_x)
         //si elle touche le joueur alors
         if(ball.y < player.y + player.size_y && ball.y + 20 > player.y){
-            //rebondir et augmenter la vitesse
+            //rebondir, augmenter la vitesse et augmenter le score
             ball.moveSpeedX = -ball.moveSpeedX;
             if(ball.moveSpeedX < 0){
-                ball.moveSpeedX -= 0.5;
+                ball.moveSpeedX -= rand() % 2;
             }
             else{
-                ball.moveSpeedX += 0.5;
+                ball.moveSpeedX += rand() % 2;
             }
+            score++;
+            sprintf(score_text, "Pong, meilleur score : %d, score: %d", meilleur_score, score);
+            gtk_window_set_title(GTK_WINDOW(window), score_text);
         }
         //sinon
         else{
@@ -130,10 +126,10 @@ gboolean update_ball_and_ennemi_position(GtkWidget* window) {
         //rebondir et augmenter la vitesse
         ball.moveSpeedX = -ball.moveSpeedX;
         if(ball.moveSpeedX < 0){
-            ball.moveSpeedX -= 0.5;
+            ball.moveSpeedX -= rand() % 2;
         }
         else{
-            ball.moveSpeedX += 0.5;
+            ball.moveSpeedX += rand() % 2;
         }
     }
     
@@ -142,10 +138,10 @@ gboolean update_ball_and_ennemi_position(GtkWidget* window) {
         //rebondir
         ball.moveSpeedY = -ball.moveSpeedY;
         if(ball.moveSpeedY < 0){
-            ball.moveSpeedY -= 0.5;
+            ball.moveSpeedY -= rand() % 2;
         }
         else{
-            ball.moveSpeedY += 0.5;
+            ball.moveSpeedY += rand() % 2;
         }
     }
     gtk_widget_queue_draw(drawing_area);
@@ -181,18 +177,17 @@ gboolean delet_all(GtkWidget *widget, cairo_t *cr, gpointer data) {
 }
 
 void play(GtkButton *button, gpointer *pointer) {
-    GtkWidget* window = (GtkWidget*)pointer;
-    char score_text[50] = "Pong, première partie";
-    int score;
-    FILE *save = fopen("score.txt", "r");
+    window = (GtkWidget*)pointer;
+    FILE *save = fopen("score.bin", "rb");
     if(save != NULL){
-        fscanf(save, "%d", &score);
-        sprintf(score_text, "Pong, meilleur score : %d", score);
+        fread(&meilleur_score, sizeof(unsigned __int16), 1, save);
+        sprintf(score_text, "Pong, meilleur score : %d, score: %d", meilleur_score, score);
         fclose(save);
     }
     else{
-        FILE *save = fopen("score.txt", "w+");
-        fputc('0', save);
+        FILE *save = fopen("score.bin", "w+b");
+        meilleur_score = 0;
+        fwrite(&meilleur_score, sizeof(unsigned __int16), 1, save);
         fclose(save);
     }
     start = time(NULL);
@@ -212,8 +207,14 @@ void play(GtkButton *button, gpointer *pointer) {
     ball.x = WINDOW_WIDTH / 2 - BALL_SIZE / 2;
     ball.y = WINDOW_HEIGHT / 2 - BALL_SIZE / 2;
 
-    g_timeout_add(30, (GSourceFunc)update_ball_and_ennemi_position, window);
+    g_timeout_add(30, (GSourceFunc)update_ball_and_ennemi_position, NULL);
 
 
     gtk_widget_show_all(window);
+}
+
+void game_setup(GtkButton *button, gpointer *pointer){
+    srand(time(NULL));
+    ball.moveSpeedY = rand() % 3 + 2.0;
+    play(button, pointer);
 }
