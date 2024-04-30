@@ -11,10 +11,7 @@ GtkWidget *window;
 
 void game_setup(GtkButton *button, gpointer *pointer);
 void info();
-
-void quit(GtkWidget *widget, gpointer data) {
-    gtk_main_quit();
-}
+void settings();
 
 void open_repo(){
     system("start https://github.com/astralarchitect/pong-GTK");
@@ -35,6 +32,7 @@ int main(int argc, char *argv[]) {
     #ifdef _WIN32 
     GtkWidget *button_repo = gtk_button_new_with_label("Repo Github");
     #endif
+    GtkWidget *button_configure = gtk_button_new_with_label("Paramètres");
     GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
 
     g_signal_connect(button_play, "clicked", G_CALLBACK(game_setup), window);
@@ -42,13 +40,15 @@ int main(int argc, char *argv[]) {
     #ifdef _WIN32 
     g_signal_connect(button_repo, "clicked", G_CALLBACK(open_repo), NULL);
     #endif
-    g_signal_connect(button_quit, "clicked", G_CALLBACK(quit), NULL);
+    g_signal_connect(button_configure, "clicked", G_CALLBACK(settings), NULL);
+    g_signal_connect(button_quit, "clicked", G_CALLBACK(gtk_main_quit), NULL);
 
     gtk_container_add(GTK_CONTAINER(box), button_play);
     gtk_container_add(GTK_CONTAINER(box), button_info);
     #ifdef _WIN32 
     gtk_container_add(GTK_CONTAINER(box), button_repo);
     #endif
+    gtk_container_add(GTK_CONTAINER(box), button_configure);
     gtk_container_add(GTK_CONTAINER(box), button_quit);
 
     gtk_container_add(GTK_CONTAINER(window), box);

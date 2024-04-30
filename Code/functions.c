@@ -2,7 +2,7 @@
 #include <glib.h>
 #include <stdbool.h>
 
-int info(){
+void info(){
     gtk_init(NULL, NULL);
 
     GtkWidget *window;
@@ -25,6 +25,32 @@ int info(){
     gtk_widget_show_all(window);
 
     gtk_main();
+}
 
-    return 0;
+void reset_best_score(){
+    remove("score.bin");
+    g_print("score reinitialisé\n");
+}
+
+void settings(){
+    gtk_init(NULL, NULL);
+
+    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    gtk_window_set_resizable((GtkWindow*)window, false);
+    gtk_window_set_title(GTK_WINDOW(window), "Paramètres");
+
+    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+
+    GtkWidget *button_reset = gtk_button_new_with_label("Réinitialiser le score");
+
+    g_signal_connect(button_reset, "clicked", G_CALLBACK(reset_best_score), window);
+
+    gtk_container_add(GTK_CONTAINER(box), button_reset);
+
+    gtk_container_add(GTK_CONTAINER(window), box);
+
+    gtk_widget_show_all(window);
+
+    gtk_main();
 }

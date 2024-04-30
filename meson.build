@@ -3,7 +3,7 @@ project('Pong-GTK', 'c', version : '1.0.0')
 gtk_dep = dependency('gtk+-3.0', version: '>=3.22')
 
 game = library('game', 'Code/game.c', dependencies: gtk_dep)
-info = library('info', 'Code/info.c', dependencies: gtk_dep)
+fonctions = library('functions', 'Code/functions.c', dependencies: gtk_dep)
 
 # Compiler les ressources uniquement sous Windows
 if host_machine.system() == 'windows'
@@ -18,4 +18,4 @@ else
     compiled_targets = []
 endif
 
-executable('Pong_launcher', 'Code/main.c', compiled_targets, dependencies: gtk_dep, install: true, link_with: [game, info])
+executable('Pong_launcher', 'Code/main.c', compiled_targets, dependencies: gtk_dep, install: true, link_with: [game, fonctions])

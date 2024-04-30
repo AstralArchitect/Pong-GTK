@@ -105,10 +105,10 @@ gboolean update_ball_and_ennemi_position() {
             //rebondir, augmenter la vitesse et augmenter le score
             ball.moveSpeedX = -ball.moveSpeedX;
             if(ball.moveSpeedX < 0){
-                ball.moveSpeedX -= rand() % 2;
+                ball.moveSpeedX -= (double)(rand() % 2) / 2.0;
             }
             else{
-                ball.moveSpeedX += rand() % 2;
+                ball.moveSpeedX += (double)(rand() % 2) / 2.0;
             }
             score++;
             sprintf(score_text, "Pong, meilleur score : %d, score: %d", meilleur_score, score);
@@ -126,10 +126,10 @@ gboolean update_ball_and_ennemi_position() {
         //rebondir et augmenter la vitesse
         ball.moveSpeedX = -ball.moveSpeedX;
         if(ball.moveSpeedX < 0){
-            ball.moveSpeedX -= rand() % 2;
+            ball.moveSpeedX -= (double)(rand() % 3) / 2.0;
         }
         else{
-            ball.moveSpeedX += rand() % 2;
+            ball.moveSpeedX += (double)(rand() % 3) / 2.0;
         }
     }
     
@@ -138,10 +138,10 @@ gboolean update_ball_and_ennemi_position() {
         //rebondir
         ball.moveSpeedY = -ball.moveSpeedY;
         if(ball.moveSpeedY < 0){
-            ball.moveSpeedY -= rand() % 2;
+            ball.moveSpeedY -= (double)(rand() % 3) / 2.0;
         }
         else{
-            ball.moveSpeedY += rand() % 2;
+            ball.moveSpeedY += (double)(rand() % 3) / 2.0;
         }
     }
     gtk_widget_queue_draw(drawing_area);
@@ -215,6 +215,6 @@ void play(GtkButton *button, gpointer *pointer) {
 
 void game_setup(GtkButton *button, gpointer *pointer){
     srand(time(NULL));
-    ball.moveSpeedY = rand() % 3 + 2.0;
+    ball.moveSpeedY = rand() % 2 + 2;
     play(button, pointer);
 }
