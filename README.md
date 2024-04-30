@@ -1,2 +1,2 @@
 # Description
-Ceci est un pong en C créé avec GTK4
+Ceci est un pong en C créé avec GTK
