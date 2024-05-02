@@ -1,11 +1,11 @@
 .SILENT:
 all:
-	meson setup build/
-	meson compile -C build/
+	meson setup builddir/
+	meson compile -C builddir/
 install:
-	meson setup build/
-	meson install -C build/
+	meson setup builddir/
+	meson install -C builddir/
 run: all
-	build/Pong_launcher
+	builddir/Pong_launcher
 clean:
-	rm build/ -rf
+	rm builddir/ -rf
