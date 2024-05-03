@@ -31,7 +31,7 @@ struct Ball ball = {0, 0, 5.0, 3.0};
 
 time_t start, stop;
 
-int8_t score = 0;
+char score = 0;
 
 int meilleur_score;
 char score_text[50] = "Pong, première partie";
@@ -65,7 +65,7 @@ gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 void quitter(){
     if(meilleur_score < score){
         FILE *save = fopen("score.bin", "w+b");
-        fwrite(&score, sizeof(int8_t), 1, save);
+        fwrite(&score, sizeof(char), 1, save);
         fclose(save);
     }
     exit(0);
@@ -185,14 +185,14 @@ void play(GtkButton *button, gpointer *pointer) {
     window2 = (GtkWidget*)pointer;
     FILE *save = fopen("score.bin", "rb");
     if(save != NULL){
-        fread(&meilleur_score, sizeof(int8_t), 1, save);
+        fread(&meilleur_score, sizeof(char), 1, save);
         sprintf(score_text, "Pong, meilleur score : %d, score: %d", meilleur_score, score);
         fclose(save);
     }
     else{
         FILE *save = fopen("score.bin", "w+b");
         meilleur_score = 0;
-        fwrite(&meilleur_score, sizeof(int8_t), 1, save);
+        fwrite(&meilleur_score, sizeof(char), 1, save);
         fclose(save);
     }
     start = time(NULL);
