@@ -36,7 +36,7 @@ unsigned short score = 0;
 int meilleur_score;
 char score_text[50] = "Pong, première partie";
 
-GtkWidget* window;
+GtkWidget *window2;
 
 gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     if (event->keyval == GDK_KEY_Up) {
@@ -73,23 +73,23 @@ void quitter(){
 void Perdu() {
     gtk_init(NULL, NULL);
 
-    gtk_widget_hide(window);
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_size_request(window, 400, 100);
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_window_set_resizable((GtkWindow*)window, false);
+    gtk_widget_hide(window2);
+    window2 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_widget_set_size_request(window2, 400, 100);
+    g_signal_connect(window2, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    gtk_window_set_resizable((GtkWindow*)window2, false);
 
     char score_text[50];
     sprintf(score_text, "Perdu ! Score : %d", score);
-    gtk_window_set_title(GTK_WINDOW(window), score_text);
+    gtk_window_set_title(GTK_WINDOW(window2), score_text);
 
     GtkWidget *button_quit = gtk_button_new_with_label("Cliquez pour quitter.");
 
     g_signal_connect(button_quit, "clicked", G_CALLBACK(quitter), NULL);
 
-    gtk_container_add(GTK_CONTAINER(window), button_quit);
+    gtk_container_add(GTK_CONTAINER(window2), button_quit);
 
-    gtk_widget_show_all(window);
+    gtk_widget_show_all(window2);
 
     gtk_main();
 }
@@ -113,13 +113,13 @@ gboolean update_ball_and_ennemi_position() {
             }
             score++;
             sprintf(score_text, "Pong, meilleur score : %d, score: %d", meilleur_score, score);
-            gtk_window_set_title(GTK_WINDOW(window), score_text);
+            gtk_window_set_title(GTK_WINDOW(window2), score_text);
         }
         //sinon
         else{
             //vous avez perdu, arret du jeu
             stop = time(NULL);
-            Perdu(window);
+            Perdu(window2);
         }
     //sinon, si elle est à droite alors
     else if (ball.x + BALL_SIZE >= WINDOW_WIDTH - ennemi.size_x)
@@ -178,7 +178,7 @@ gboolean delet_all(GtkWidget *widget, cairo_t *cr, gpointer data) {
 }
 
 void play(GtkButton *button, gpointer *pointer) {
-    window = (GtkWidget*)pointer;
+    window2 = (GtkWidget*)pointer;
     FILE *save = fopen("score.bin", "rb");
     if(save != NULL){
         fread(&meilleur_score, sizeof(unsigned short), 1, save);
@@ -192,18 +192,18 @@ void play(GtkButton *button, gpointer *pointer) {
         fclose(save);
     }
     start = time(NULL);
-    gtk_widget_hide(window);
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_window_set_resizable((GtkWindow*)window, false);
+    gtk_widget_hide(window2);
+    window2 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    g_signal_connect(window2, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    gtk_window_set_resizable((GtkWindow*)window2, false);
 
     drawing_area = gtk_drawing_area_new();
     gtk_widget_set_size_request(drawing_area, WINDOW_WIDTH, WINDOW_HEIGHT);
-    gtk_window_set_title(GTK_WINDOW(window), score_text);
-    gtk_container_add(GTK_CONTAINER(window), drawing_area);
+    gtk_window_set_title(GTK_WINDOW(window2), score_text);
+    gtk_container_add(GTK_CONTAINER(window2), drawing_area);
 
     g_signal_connect(drawing_area, "draw", G_CALLBACK(draw_callback), NULL);
-    g_signal_connect(window, "key-press-event", G_CALLBACK(keyboard_manager), NULL);
+    g_signal_connect(window2, "key-press-event", G_CALLBACK(keyboard_manager), NULL);
 
     ball.x = WINDOW_WIDTH / 2 - BALL_SIZE / 2;
     ball.y = WINDOW_HEIGHT / 2 - BALL_SIZE / 2;
@@ -211,7 +211,7 @@ void play(GtkButton *button, gpointer *pointer) {
     g_timeout_add(30, (GSourceFunc)update_ball_and_ennemi_position, NULL);
 
 
-    gtk_widget_show_all(window);
+    gtk_widget_show_all(window2);
 }
 
 void game_setup(GtkButton *button, gpointer *pointer){
