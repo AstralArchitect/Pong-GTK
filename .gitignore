@@ -1,3 +1,4 @@
-builddir/
+.rundata/
 .vscode/
+builddir/
 score.bin

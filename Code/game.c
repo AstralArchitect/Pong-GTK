@@ -31,10 +31,12 @@ struct Ball ball = {0, 0, 5.0, 3.0};
 
 time_t start, stop;
 
-unsigned short score = 0;
+int8_t score = 0;
 
 int meilleur_score;
 char score_text[50] = "Pong, première partie";
+
+int playerMoveSpeed = 10;
 
 GtkWidget *window2;
 
@@ -42,15 +44,15 @@ gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_d
     if (event->keyval == GDK_KEY_Up) {
         if (player.y > 0)
         {
-            player.y -= 10;
+            player.y -= playerMoveSpeed;
         }
     }
     else if (event->keyval == GDK_KEY_Down) {
         if (player.y + player.size_y > WINDOW_HEIGHT)
         {
-            player.y -= 10;
+            player.y -= playerMoveSpeed;
         }
-        player.y += 10;
+        player.y += playerMoveSpeed;
     }
     else if (event->keyval == 'q' || event->keyval == 'Q')
     {
@@ -63,10 +65,9 @@ gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 void quitter(){
     if(meilleur_score < score){
         FILE *save = fopen("score.bin", "w+b");
-        fwrite(&score, sizeof(unsigned short), 1, save);
+        fwrite(&score, sizeof(int8_t), 1, save);
         fclose(save);
     }
-    
     exit(0);
 }
 
@@ -101,6 +102,7 @@ gboolean update_ball_and_ennemi_position() {
     ennemi.y = ball.y - ennemi.size_y / 2;
     //si la balle est à gauch alors
     if (ball.x <= 0 + player.size_x)
+    {
         //si elle touche le joueur alors
         if(ball.y < player.y + player.size_y && ball.y + 20 > player.y){
             //rebondir, augmenter la vitesse et augmenter le score
@@ -121,6 +123,8 @@ gboolean update_ball_and_ennemi_position() {
             stop = time(NULL);
             Perdu(window2);
         }
+        playerMoveSpeed++;
+    }
     //sinon, si elle est à droite alors
     else if (ball.x + BALL_SIZE >= WINDOW_WIDTH - ennemi.size_x)
     {
@@ -181,14 +185,14 @@ void play(GtkButton *button, gpointer *pointer) {
     window2 = (GtkWidget*)pointer;
     FILE *save = fopen("score.bin", "rb");
     if(save != NULL){
-        fread(&meilleur_score, sizeof(unsigned short), 1, save);
+        fread(&meilleur_score, sizeof(int8_t), 1, save);
         sprintf(score_text, "Pong, meilleur score : %d, score: %d", meilleur_score, score);
         fclose(save);
     }
     else{
         FILE *save = fopen("score.bin", "w+b");
         meilleur_score = 0;
-        fwrite(&meilleur_score, sizeof(unsigned short), 1, save);
+        fwrite(&meilleur_score, sizeof(int8_t), 1, save);
         fclose(save);
     }
     start = time(NULL);
