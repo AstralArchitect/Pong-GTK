@@ -1,6 +1,5 @@
 #include <gtk/gtk.h>
 #include <glib.h>
-#include <time.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -18,6 +17,9 @@ void open_repo(){
 }
 
 int main(int argc, char *argv[]) {
+    #ifdef _WIN32
+    g_setenv("GTK_THEME", "win32", FALSE);
+    #endif
     gtk_init(&argc, &argv);
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -25,7 +27,7 @@ int main(int argc, char *argv[]) {
     gtk_window_set_resizable((GtkWindow*)window, false);
     gtk_window_set_title(GTK_WINDOW(window), "Pong Launcher");
 
-    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
 
     GtkWidget *button_play = gtk_button_new_with_label("Jouer à Pong");
     GtkWidget *button_info = gtk_button_new_with_label("info");
@@ -34,6 +36,15 @@ int main(int argc, char *argv[]) {
     #endif
     GtkWidget *button_configure = gtk_button_new_with_label("Paramètres");
     GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
+
+    // Définir la taille minimale des boutons
+    gtk_widget_set_size_request(button_play, 200, 50);
+    gtk_widget_set_size_request(button_info, 200, 50);
+    #ifdef _WIN32 
+    gtk_widget_set_size_request(button_repo, 200, 50);
+    #endif
+    gtk_widget_set_size_request(button_configure, 200, 50);
+    gtk_widget_set_size_request(button_quit, 200, 50);
 
     g_signal_connect(button_play, "clicked", G_CALLBACK(game_setup), window);
     g_signal_connect(button_info, "clicked", G_CALLBACK(info), NULL);
@@ -59,3 +70,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
