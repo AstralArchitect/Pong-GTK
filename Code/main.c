@@ -25,6 +25,11 @@ int main(int argc, char *argv[]) {
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_window_set_resizable((GtkWindow*)window, false);
+    #ifdef _WIN32
+    gtk_window_set_default_size((GtkWindow*)window, (200 * 5) + ((5 * 5) - 5), 70);
+    #else
+    gtk_window_set_default_size((GtkWindow*)window, (200 * 4) + ((5 * 4) - 5), 70);
+    #endif
     gtk_window_set_title(GTK_WINDOW(window), "Pong Launcher");
 
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
@@ -38,13 +43,13 @@ int main(int argc, char *argv[]) {
     GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
 
     // Définir la taille minimale des boutons
-    gtk_widget_set_size_request(button_play, 200, 50);
-    gtk_widget_set_size_request(button_info, 200, 50);
+    gtk_widget_set_size_request(button_play, 200, 70);
+    gtk_widget_set_size_request(button_info, 200, 70);
     #ifdef _WIN32 
-    gtk_widget_set_size_request(button_repo, 200, 50);
+    gtk_widget_set_size_request(button_repo, 200, 70);
     #endif
-    gtk_widget_set_size_request(button_configure, 200, 50);
-    gtk_widget_set_size_request(button_quit, 200, 50);
+    gtk_widget_set_size_request(button_configure, 200, 70);
+    gtk_widget_set_size_request(button_quit, 200, 70);
 
     g_signal_connect(button_play, "clicked", G_CALLBACK(game_setup), window);
     g_signal_connect(button_info, "clicked", G_CALLBACK(info), NULL);
@@ -70,4 +75,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
