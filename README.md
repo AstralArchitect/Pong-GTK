@@ -9,7 +9,7 @@ Le score affiché sur le titre de la fenêtre correspond au nombre de fois que v
 ## Fin de la partie
 la partie s'arrète lorsque vous avez ratté la balle, c'est-à-dire que la balle est passé derrière vous car vous ne l'avez pas touché.
 
-# Bon amusement
+## Bon amusement
 
 # Comment installer
 Lorsque vous clonez le repository depuis github, vous ne téléchrger que le code source. Si vous voulez l'utiliser, il faudra donc le compiler.
