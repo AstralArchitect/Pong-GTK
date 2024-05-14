@@ -1,7 +1,7 @@
-#include <gtk/gtk.h>
 #include <glib.h>
 #include <time.h>
 #include <stdbool.h>
+#include "prototypes.h"
 
 #define BALL_SIZE 20
 #define PLAYERS_WIDTH 20
@@ -10,20 +10,7 @@
 #define WINDOW_HEIGHT 600
 
 GtkWidget *drawing_area;
-struct Ball
-{
-    int x;
-    int y;
-    float moveSpeedX;
-    float moveSpeedY;
-};
-struct Player
-{
-    int x;
-    int y;
-    int size_x;
-    int size_y;
-};
+
 struct Player player = {0, WINDOW_HEIGHT / 2, PLAYERS_WIDTH, PLYERS_HEIGHT};
 struct Player ennemi = {WINDOW_WIDTH - PLAYERS_WIDTH, 0, PLAYERS_WIDTH, PLYERS_HEIGHT};
 
@@ -39,6 +26,9 @@ char score_text[50] = "Pong, première partie";
 int playerMoveSpeed = 10;
 
 GtkWidget *window2;
+GtkWidget *window1;
+
+void error();
 
 gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {
     if (event->keyval == GDK_KEY_Up) {
@@ -65,10 +55,21 @@ gboolean keyboard_manager(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 void quitter(){
     if(meilleur_score < score){
         FILE *save = fopen("score.bin", "w+b");
-        fwrite(&score, sizeof(char), 1, save);
-        fclose(save);
+        if (save != NULL)
+        {
+            fwrite(&score, sizeof(char), 1, save);
+            fclose(save);
+        }
+        else
+        {
+            error();
+        }
     }
-    exit(0);
+    score = 0;
+    meilleur_score = 0;
+    strcpy(&score_text[0], "Pong, première partie");
+    gtk_widget_show(window1);
+    gtk_widget_hide(window2);
 }
 
 void Perdu() {
@@ -121,7 +122,7 @@ gboolean update_ball_and_ennemi_position() {
         else{
             //vous avez perdu, arret du jeu
             stop = time(NULL);
-            Perdu(window2);
+            Perdu();
         }
         playerMoveSpeed++;
     }
@@ -182,7 +183,7 @@ gboolean delet_all(GtkWidget *widget, cairo_t *cr, gpointer data) {
 }
 
 void play(GtkButton *button, gpointer *pointer) {
-    window2 = (GtkWidget*)pointer;
+    window1 = (GtkWidget*)pointer;
     FILE *save = fopen("score.bin", "rb");
     if(save != NULL){
         fread(&meilleur_score, sizeof(char), 1, save);
@@ -196,7 +197,7 @@ void play(GtkButton *button, gpointer *pointer) {
         fclose(save);
     }
     start = time(NULL);
-    gtk_widget_hide(window2);
+    gtk_widget_hide(window1);
     window2 = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(window2, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     gtk_window_set_resizable((GtkWindow*)window2, false);

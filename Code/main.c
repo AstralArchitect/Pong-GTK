@@ -1,19 +1,23 @@
-#include <gtk/gtk.h>
 #include <glib.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "prototypes.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
 GtkWidget *window;
 
-void game_setup(GtkButton *button, gpointer *pointer);
-void info();
-void settings();
-
 void open_repo(){
+    #ifdef _WIN32
     system("start https://github.com/astralarchitect/pong-GTK");
+    #else
+    system("xdg-open https://github.com/astralarchitect/pong-GTK");
+    #endif
+}
+
+void quitterFonction(){
+    exit(0);
 }
 
 int main(int argc, char *argv[]) {
@@ -23,47 +27,35 @@ int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(window, "destroy", G_CALLBACK(quitterFonction), NULL);
     gtk_window_set_resizable((GtkWindow*)window, false);
-    #ifdef _WIN32
     gtk_window_set_default_size((GtkWindow*)window, (200 * 5) + ((5 * 5) - 5), 70);
-    #else
-    gtk_window_set_default_size((GtkWindow*)window, (200 * 4) + ((5 * 4) - 5), 70);
-    #endif
     gtk_window_set_title(GTK_WINDOW(window), "Pong Launcher");
 
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
 
     GtkWidget *button_play = gtk_button_new_with_label("Jouer à Pong");
     GtkWidget *button_info = gtk_button_new_with_label("info");
-    #ifdef _WIN32 
     GtkWidget *button_repo = gtk_button_new_with_label("Repo Github");
-    #endif
     GtkWidget *button_configure = gtk_button_new_with_label("Paramètres");
     GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
 
     // Définir la taille minimale des boutons
     gtk_widget_set_size_request(button_play, 200, 70);
     gtk_widget_set_size_request(button_info, 200, 70);
-    #ifdef _WIN32 
     gtk_widget_set_size_request(button_repo, 200, 70);
-    #endif
     gtk_widget_set_size_request(button_configure, 200, 70);
     gtk_widget_set_size_request(button_quit, 200, 70);
 
     g_signal_connect(button_play, "clicked", G_CALLBACK(game_setup), window);
     g_signal_connect(button_info, "clicked", G_CALLBACK(info), NULL);
-    #ifdef _WIN32 
     g_signal_connect(button_repo, "clicked", G_CALLBACK(open_repo), NULL);
-    #endif
     g_signal_connect(button_configure, "clicked", G_CALLBACK(settings), NULL);
-    g_signal_connect(button_quit, "clicked", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(button_quit, "clicked", G_CALLBACK(quitterFonction), NULL);
 
     gtk_container_add(GTK_CONTAINER(box), button_play);
     gtk_container_add(GTK_CONTAINER(box), button_info);
-    #ifdef _WIN32 
     gtk_container_add(GTK_CONTAINER(box), button_repo);
-    #endif
     gtk_container_add(GTK_CONTAINER(box), button_configure);
     gtk_container_add(GTK_CONTAINER(box), button_quit);
 

@@ -2,3 +2,5 @@
 .vscode/
 builddir/
 score.bin
+Pong-cache/
+Pong-SetupFiles/

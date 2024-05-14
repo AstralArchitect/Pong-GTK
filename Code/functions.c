@@ -1,6 +1,39 @@
-#include <gtk/gtk.h>
+#include "prototypes.h"
 #include <glib.h>
 #include <stdbool.h>
+
+void quit(){
+    exit(1);
+}
+
+void error(){
+    gtk_init(NULL, NULL);
+
+    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    
+    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+    gtk_window_set_default_size(GTK_WINDOW(window), 100, 100);
+    gtk_window_set_title(GTK_WINDOW(window), "Error");
+    
+    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    
+    GtkWidget *label = gtk_label_new("  Erreur, impossible d'ouvrir le fichier score.bin  ");
+    GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
+
+    g_signal_connect(button_quit, "clicked", G_CALLBACK(quit), NULL);
+    
+    gtk_widget_set_size_request(button_quit, 200, 70);
+    
+    gtk_container_add(GTK_CONTAINER(box),label);
+    gtk_container_add(GTK_CONTAINER(box), button_quit);
+    gtk_container_add(GTK_CONTAINER(window), box);
+    
+    gtk_widget_show_all(window);
+    
+    gtk_main();
+}
 
 void info(){
     gtk_init(NULL, NULL);
@@ -27,10 +60,6 @@ void info(){
     gtk_main();
 }
 
-void quit(){
-    exit(1);
-}
-
 void on_change_score_clicked(GtkButton *button, GtkEntry *user_data) {
     bool supprFile = false;
     char score;
@@ -40,72 +69,25 @@ void on_change_score_clicked(GtkButton *button, GtkEntry *user_data) {
         supprFile = true;
         fichier = fopen("score.bin", "w+b");
         if(fichier == NULL){
-            gtk_init(NULL, NULL);
-
-            GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-            g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-            gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
-            gtk_window_set_default_size(GTK_WINDOW(window), 100, 100);
-            gtk_window_set_title(GTK_WINDOW(window), "Error");
-
-            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-
-            GtkWidget *label = gtk_label_new("  Erreur, impossible d'ouvrir le fichier score.bin  ");
-            GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
-
-            g_signal_connect(button_quit, "clicked", G_CALLBACK(quit), NULL);
-
-            gtk_widget_set_size_request(button_quit, 200, 70);
-
-            gtk_container_add(GTK_CONTAINER(box),label);
-            gtk_container_add(GTK_CONTAINER(box), button_quit);
-
-            gtk_container_add(GTK_CONTAINER(window), box);
-
-            gtk_widget_show_all(window);
-
-            gtk_main();
+            error();
         }
         score = 0;
         fwrite(&score, sizeof(char), 1, fichier);
         fclose(fichier);
         fichier = fopen("score.bin", "rb");
         if(fichier == NULL){
-            gtk_init(NULL, NULL);
-
-            GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-            g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-            gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
-            gtk_window_set_default_size(GTK_WINDOW(window), 100, 100);
-            gtk_window_set_title(GTK_WINDOW(window), "Error");
-
-            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-
-            GtkWidget *label = gtk_label_new("  Erreur, impossible d'ouvrir le fichier score.bin  ");
-            GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
-
-            g_signal_connect(button_quit, "clicked", G_CALLBACK(quit), NULL);
-
-            gtk_widget_set_size_request(button_quit, 200, 70);
-
-            gtk_container_add(GTK_CONTAINER(box),label);
-            gtk_container_add(GTK_CONTAINER(box), button_quit);
-
-            gtk_container_add(GTK_CONTAINER(window), box);
-
-            gtk_widget_show_all(window);
-
-            gtk_main();
+            error();
         }
     }
     fread(&score, sizeof(char), 1, fichier);
     fclose(fichier);
+
     if (supprFile)
     {
         remove("score.bin");
     }
 
-    if (score >= 10)
+    if (score >= (char)10)
     {
         GtkEntry *entry = GTK_ENTRY(user_data);
         const gchar *text = gtk_entry_get_text(entry);
@@ -115,31 +97,7 @@ void on_change_score_clicked(GtkButton *button, GtkEntry *user_data) {
         FILE *fichier = fopen("score.bin", "w+b");
         if (fichier == NULL)
         {
-            gtk_init(NULL, NULL);
-
-            GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-            g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-            gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
-            gtk_window_set_default_size(GTK_WINDOW(window), 100, 100);
-            gtk_window_set_title(GTK_WINDOW(window), "Error");
-
-            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-
-            GtkWidget *label = gtk_label_new("  Erreur, impossible d'ouvrir le fichier score.bin  ");
-            GtkWidget *button_quit = gtk_button_new_with_label("Quitter");
-
-            g_signal_connect(button_quit, "clicked", G_CALLBACK(quit), NULL);
-
-            gtk_widget_set_size_request(button_quit, 200, 70);
-
-            gtk_container_add(GTK_CONTAINER(box),label);
-            gtk_container_add(GTK_CONTAINER(box), button_quit);
-
-            gtk_container_add(GTK_CONTAINER(window), box);
-
-            gtk_widget_show_all(window);
-
-            gtk_main();
+            error();
         }
         fwrite(&score, sizeof(char), 1, fichier);
         fclose(fichier);

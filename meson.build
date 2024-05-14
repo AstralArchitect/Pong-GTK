@@ -13,8 +13,10 @@ if host_machine.system() == 'windows'
     extra_args = ['-O', 'coff']
     
     compiled_targets = windows.compile_resources(resource_files, args: extra_args, depend_files: ['iconData/icon.ico'], depends: [], include_directories: ['../resources'])
+
+    executable('Pong_launcher', sources, compiled_targets, dependencies: gtk_dep, install: true)
 else
     compiled_targets = []
-endif
 
-executable('Pong_launcher', sources, compiled_targets, dependencies: gtk_dep, install: true)
+    executable('Pong_launcher', sources, compiled_targets, dependencies: gtk_dep, install: false)
+endif
