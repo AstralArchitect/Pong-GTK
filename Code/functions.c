@@ -175,13 +175,13 @@ void settings(){
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
     GtkWidget *button_reset = gtk_button_new_with_label("Réinitialiser le score");
-    GtkWidget *button_cheat = gtk_button_new_with_label("Changer le meilleur score.(Requiert un meilleur score superieur à 10)");
+    //GtkWidget *button_cheat = gtk_button_new_with_label("Changer le meilleur score.(Requiert un meilleur score superieur à 10)");
 
     g_signal_connect(button_reset, "clicked", G_CALLBACK(reset_best_score), window);
-    g_signal_connect(button_cheat, "clicked", G_CALLBACK(change_score), window);
+    //g_signal_connect(button_cheat, "clicked", G_CALLBACK(change_score), window);
 
     gtk_container_add(GTK_CONTAINER(box), button_reset);
-    gtk_container_add(GTK_CONTAINER(box), button_cheat);
+    //gtk_container_add(GTK_CONTAINER(box), button_cheat);
 
     gtk_container_add(GTK_CONTAINER(window), box);
 
