@@ -7,6 +7,7 @@ struct Ball
     float moveSpeedX;
     float moveSpeedY;
 };
+
 struct Player
 {
     int x;
